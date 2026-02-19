@@ -3,8 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "build": "vite build && cp -r public/build ../public/ 2>/dev/null || :",
+        "vercel-build": "npm install && npm run build"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
