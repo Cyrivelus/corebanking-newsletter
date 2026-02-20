@@ -2,12 +2,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="font-bold text-xl text-indigo-600 tracking-tight">
-                        {{-- Remplacez x-application-logo par votre texte ou image --}}
-                        NEWS<span class="text-gray-800">PRO</span>
-                    </a>
-                </div>
+              <div class="shrink-0 flex items-center">
+    <a href="{{ route('dashboard') }}" class="text-xl font-bold tracking-tight">
+        NEWS<span class="text-indigo-600">PRO</span>
+    </a>
+</div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">

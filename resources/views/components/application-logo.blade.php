@@ -1,5 +1,3 @@
-<div class="flex items-center">
-    <span class="font-black text-2xl tracking-tighter text-gray-900">
-        NEWS<span class="text-indigo-600">PRO</span>
-    </span>
-</div>
+<h1 class="text-3xl font-bold text-indigo-600">
+    News<span class="text-gray-800">Pro</span>
+</h1>
