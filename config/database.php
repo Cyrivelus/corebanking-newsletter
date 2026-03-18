@@ -4,6 +4,14 @@ use Illuminate\Support\Str;
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Database Connection Name
+    |--------------------------------------------------------------------------
+    | En local (.env) : sqlite
+    | Sur Vercel (Variables d'env) : pgsql
+    */
+
     'default' => env('DB_CONNECTION', 'sqlite'),
 
     'connections' => [
@@ -20,23 +28,37 @@ return [
             'driver' => 'pgsql',
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
+            'database' => env('DB_DATABASE', 'postgres'), // 'postgres' par défaut pour Supabase
+            'username' => env('DB_USERNAME', 'postgres'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'require',
-            'options' => [],
+            'sslmode' => env('DB_SSLMODE', 'require'), // Force le SSL pour Supabase
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                PDO::ATTR_TIMEOUT => 5,
+            ]) : [],
         ],
 
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Migration Repository Table
+    |--------------------------------------------------------------------------
+    */
 
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redis Databases (Optionnel pour NewsPro)
+    |--------------------------------------------------------------------------
+    */
 
     'redis' => [
         'client' => env('REDIS_CLIENT', 'phpredis'),
@@ -46,8 +68,8 @@ return [
         ],
         'default' => [
             'url' => env('REDIS_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '6379'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_DB', '0'),
         ],
     ],
