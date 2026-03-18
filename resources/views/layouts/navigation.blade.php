@@ -7,6 +7,11 @@
         NEWS<span class="text-indigo-600">PRO</span>
     </a>
 </div>
+<div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+    <x-nav-link :href="route('admin.newsletter.index')" :active="request()->routeIs('admin.newsletter.*')">
+        {{ __('Newsletter') }}
+    </x-nav-link>
+</div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -101,6 +106,9 @@
                                         this.closest('form').submit();" class="text-red-600">
                         {{ __('Déconnexion') }}
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.newsletter.index')" :active="request()->routeIs('admin.newsletter.*')">
+    {{ __('Newsletter') }}
+</x-responsive-nav-link>
                 </form>
             </div>
         </div>
