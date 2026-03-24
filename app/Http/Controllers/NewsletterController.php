@@ -1,104 +1,75 @@
 <?php
-// app/Http/Controllers/NewsletterController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Newsletter;
 use App\Mail\NewsletterWelcome;
-use App\Mail\NewsletterCampaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class NewsletterController extends Controller
 {
-    /**
-     * Afficher le formulaire d'inscription
-     */
     public function showForm()
     {
         return view('newsletter.subscribe');
     }
 
-    /**
-     * S'inscrire à la newsletter
-     */
     public function subscribe(Request $request)
     {
+        // Validation stricte pour éviter les injections de scripts
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:newsletters,email',
-            'name' => 'nullable|string|max:255',
+            'email' => 'required|email:rfc,dns|unique:newsletters,email|max:255',
+            'name'  => 'nullable|string|strip_tags|max:100', // strip_tags évite le JS malveillant
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
+            return redirect()->to('/newsletter')
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        $newsletter = Newsletter::create([
-            'email' => $request->email,
-            'name' => $request->name,
-        ]);
+        try {
+            $newsletter = Newsletter::create([
+                'email' => filter_var($request->email, FILTER_SANITIZE_EMAIL),
+                'name'  => htmlspecialchars($request->name),
+            ]);
 
-        // Envoyer email de bienvenue
-        Mail::to($newsletter->email)->send(new NewsletterWelcome($newsletter));
+            // Envoi de l'email
+            Mail::to($newsletter->email)->send(new NewsletterWelcome($newsletter));
 
-        return redirect()->route('newsletter.thanks')
-            ->with('success', 'Merci de vous être inscrit à notre newsletter !');
+            // Redirection explicite vers l'URL complète pour éviter l'alerte "Redirector"
+            return redirect()->to(config('app.url') . '/newsletter/thanks')
+                ->with('success', 'Inscription réussie !');
+
+        } catch (\Exception $e) {
+            Log::error("Erreur Newsletter: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Une erreur technique est survenue.');
+        }
     }
 
-    /**
-     * Page de remerciement
-     */
-    public function thanks()
-    {
-        return view('newsletter.thanks');
-    }
+    public function thanks() { return view('newsletter.thanks'); }
 
-    /**
-     * Se désinscrire de la newsletter
-     */
     public function unsubscribe($token)
     {
-        $newsletter = Newsletter::where('token', $token)->firstOrFail();
+        // On sanitize le token pour éviter les attaques par URL
+        $cleanToken = preg_replace('/[^a-zA-Z0-9]/', '', $token);
+        $newsletter = Newsletter::where('token', $cleanToken)->firstOrFail();
 
         if ($newsletter->is_subscribed) {
             $newsletter->unsubscribe();
-
-            return view('newsletter.unsubscribed', [
-                'email' => $newsletter->email
-            ]);
+            return view('newsletter.unsubscribed', ['email' => $newsletter->email]);
         }
-
-        return redirect()->route('home');
+        return redirect()->to('/');
     }
 
-    /**
-     * Se réinscrire
-     */
     public function resubscribe($token)
     {
-        $newsletter = Newsletter::where('token', $token)->firstOrFail();
-
+        $cleanToken = preg_replace('/[^a-zA-Z0-9]/', '', $token);
+        $newsletter = Newsletter::where('token', $cleanToken)->firstOrFail();
         $newsletter->resubscribe();
 
-        return redirect()->route('newsletter.thanks')
-            ->with('success', 'Vous êtes de nouveau inscrit à notre newsletter !');
-    }
-
-    /**
-     * Vérifier le statut (API)
-     */
-    public function checkStatus(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        $subscriber = Newsletter::where('email', $request->email)->first();
-
-        return response()->json([
-            'subscribed' => $subscriber ? $subscriber->is_subscribed : false,
-            'email' => $request->email
-        ]);
+        return redirect()->to('/newsletter/thanks');
     }
 }
