@@ -8,8 +8,6 @@ return [
     |--------------------------------------------------------------------------
     | Default Database Connection Name
     |--------------------------------------------------------------------------
-    | En local (.env) : sqlite
-    | Sur Vercel (Variables d'env) : pgsql
     */
 
     'default' => env('DB_CONNECTION', 'sqlite'),
@@ -24,18 +22,20 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-       'pgsql' => [
-    'driver' => 'pgsql',
-    'host' => 'aws-0-eu-central-1.pooler.supabase.com',
-    'port' => '6543',
-    'database' => 'newsletter_prod',
-    'username' => 'postgres.hwllvkdvhfrkajgxwdeo', // <--- AJOUTE LE POINT ET L'ID ICI
-    'password' => 'fireFlame237KLMNOPQSDFG',
-    'charset' => 'utf8',
-    'prefix' => '',
-    'search_path' => 'public',
-    'sslmode' => 'require',
-],
+        'pgsql' => [
+            'driver' => 'pgsql',
+            'host' => 'aws-0-eu-central-1.pooler.supabase.com',
+            'port' => '6543',
+            // Sur le port 6543, Supabase attend souvent 'postgres' comme nom de DB technique
+            'database' => 'postgres',
+            'username' => 'postgres.hwllvkdvhfrkajgxwdeo',
+            'password' => 'fireFlame237KLMNOPQSDFG',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'require',
+        ],
 
     ],
 
@@ -52,7 +52,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Redis Databases (Optionnel pour NewsPro)
+    | Redis Databases
     |--------------------------------------------------------------------------
     */
 
