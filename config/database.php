@@ -23,20 +23,19 @@ return [
         ],
 
         'pgsql' => [
-            'driver' => 'pgsql',
-            'host' => 'aws-0-eu-central-1.pooler.supabase.com',
-            'port' => '6543',
-            // Sur le port 6543, Supabase attend souvent 'postgres' comme nom de DB technique
-            'database' => 'postgres',
-            'username' => 'postgres.hwllvkdvhfrkajgxwdeo',
-            'password' => 'fireFlame237KLMNOPQSDFG',
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => 'require',
-        ],
-
+    'driver' => 'pgsql',
+    // On utilise l'hôte direct (celui de ton image Supabase)
+    'host' => 'db.hwllvkdvhfrkajgxwdeo.supabase.co',
+    'port' => '5432',
+    'database' => 'postgres',
+    'username' => 'postgres', // On revient à l'utilisateur simple
+    'password' => 'fireFlame237KLMNOPQSDFG',
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'search_path' => 'public',
+    'sslmode' => 'require',
+],
     ],
 
     /*
