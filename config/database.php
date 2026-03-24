@@ -25,21 +25,19 @@ return [
         ],
 
         'pgsql' => [
-            'driver' => 'pgsql',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'postgres'), // 'postgres' par défaut pour Supabase
-            'username' => env('DB_USERNAME', 'postgres'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'require'), // Force le SSL pour Supabase
-            'options' => extension_loaded('pdo_pgsql') ? array_filter([
-                PDO::ATTR_TIMEOUT => 5,
-            ]) : [],
-        ],
+    'driver' => 'pgsql',
+    // On force l'hôte du pooler Supabase (Transaction mode)
+    'host' => 'aws-0-eu-central-1.pooler.supabase.com',
+    'port' => '6543',
+    'database' => 'newsletter_prod', // FORCE LE NOM ICI
+    'username' => 'postgres.hwllvkdvhfrkajgxwdeo', // UTILISE TON IDENTIFIANT COMPLET
+    'password' => 'fireFlame237KLMNOPQSDFG',
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'search_path' => 'public',
+    'sslmode' => 'require',
+],
 
     ],
 
