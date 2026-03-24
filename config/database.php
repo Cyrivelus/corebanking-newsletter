@@ -24,17 +24,15 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'pgsql' => [
+       'pgsql' => [
     'driver' => 'pgsql',
-    // On force l'hôte du pooler Supabase (Transaction mode)
     'host' => 'aws-0-eu-central-1.pooler.supabase.com',
     'port' => '6543',
-    'database' => 'newsletter_prod', // FORCE LE NOM ICI
-    'username' => 'postgres.hwllvkdvhfrkajgxwdeo', // UTILISE TON IDENTIFIANT COMPLET
+    'database' => 'newsletter_prod',
+    'username' => 'postgres.hwllvkdvhfrkajgxwdeo', // <--- AJOUTE LE POINT ET L'ID ICI
     'password' => 'fireFlame237KLMNOPQSDFG',
     'charset' => 'utf8',
     'prefix' => '',
-    'prefix_indexes' => true,
     'search_path' => 'public',
     'sslmode' => 'require',
 ],
