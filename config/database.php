@@ -22,25 +22,18 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        'pgsql' => [
-            'driver' => 'pgsql',
-            // Priorité absolue à la variable DATABASE_URL de Vercel
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', 'aws-0-eu-central-1.pooler.supabase.com'),
-            'port' => env('DB_PORT', '6543'),
-            'database' => env('DB_DATABASE', 'postgres'),
-            'username' => env('DB_USERNAME', 'postgres.hwllvkdvhfrkajgxwdeo'),
-            'password' => env('DB_PASSWORD', 'fireFlame237KLMNOPQSDFG'),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => 'require',
-            'options' => [
-                // Désactiver les connexions persistantes pour éviter de saturer le pooler Supabase
-                PDO::ATTR_PERSISTENT => false,
-            ],
-        ],
+       'pgsql' => [
+    'driver' => 'pgsql',
+    'url' => env('DATABASE_URL'), // Vercel injecte tout ici
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'search_path' => 'public',
+    'sslmode' => 'require',
+    'options' => [
+        PDO::ATTR_PERSISTENT => false,
+    ],
+],
 
     ],
 
