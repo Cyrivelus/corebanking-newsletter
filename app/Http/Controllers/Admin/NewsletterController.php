@@ -5,62 +5,41 @@ namespace App\Http\Controllers;
 use App\Models\Newsletter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
 
 class NewsletterController extends Controller
 {
-    public function showForm()
-    {
-        return view('newsletter.subscribe');
-    }
-
     public function subscribe(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email:rfc,dns|unique:newsletters,email|max:255',
+            'email' => 'required|email:rfc,dns|max:255',
             'name'  => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         try {
+            // On vérifie manuellement l'unicité pour attraper l'erreur de connexion ici
+            $exists = Newsletter::where('email', $request->email)->exists();
+
+            if ($exists) {
+                return redirect()->back()->withErrors(['email' => __('Cet email est déjà inscrit.')])->withInput();
+            }
+
             Newsletter::create([
                 'email' => filter_var($request->email, FILTER_SANITIZE_EMAIL),
                 'name'  => strip_tags($request->name),
-                'is_subscribed' => true,
             ]);
 
-            return redirect()->route('newsletter.thanks')
-                ->with('success', __('Merci pour votre inscription !'));
+            return redirect()->route('newsletter.thanks');
 
-        } catch (\Illuminate\Database\QueryException $e) {
-            Log::error("Erreur Inscription Newsletter: " . $e->getMessage());
-
+        } catch (QueryException $e) {
+            // Si Supabase rejette encore la connexion, on affiche un message propre
             return redirect()->back()
-                ->withErrors(['db_error' => __('Une erreur technique est survenue. Veuillez réessayer plus tard.')])
+                ->withErrors(['db_error' => 'Erreur de connexion à la base de données. Vérifiez la configuration du Pooler.'])
                 ->withInput();
         }
-    }
-
-    public function thanks()
-    {
-        return view('newsletter.thanks');
-    }
-
-    public function unsubscribe(Request $request, $token = null)
-    {
-        // Logique de désabonnement via token ou email
-        $email = $request->query('email');
-        $subscriber = Newsletter::where('email', $email)->first();
-
-        if ($subscriber) {
-            $subscriber->update(['is_subscribed' => false]);
-        }
-
-        return view('newsletter.unsubscribed_success', ['email' => $email]);
     }
 }

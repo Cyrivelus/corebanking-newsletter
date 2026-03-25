@@ -5,13 +5,20 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Admin\NewsletterController as AdminNewsletterController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 // Accueil : Redirection vers le formulaire
 Route::get('/', function () {
     return redirect()->route('newsletter.form');
 })->name('home');
 
-// Switcher de langue
+// Switcher de langue (Stocké en session)
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['fr', 'en', 'es'])) {
         session(['locale' => $locale]);
@@ -19,41 +26,43 @@ Route::get('lang/{locale}', function ($locale) {
     return redirect()->back();
 })->name('lang.switch');
 
-// =============================
-// NEWSLETTER PUBLIQUE
-// =============================
+// ==========================================================
+// SECTION PUBLIQUE : NEWSLETTER
+// ==========================================================
 Route::prefix('newsletter')->group(function () {
 
-    // Page du formulaire (GET)
+    // Affichage du formulaire
     Route::get('/', [NewsletterController::class, 'showForm'])
         ->name('newsletter.form');
 
-    // Traitement de l'abonnement (POST)
+    // Inscription (POST)
     Route::post('/subscribe', [NewsletterController::class, 'subscribe'])
         ->name('newsletter.subscribe');
 
-    // Page de remerciement (GET)
+    // Page de succès
     Route::get('/thanks', [NewsletterController::class, 'thanks'])
         ->name('newsletter.thanks');
 
-    // Désabonnement (GET)
-    Route::get('/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
+    // Désabonnement (Supporte Token ou Email)
+    Route::get('/unsubscribe/{email_or_token}', [NewsletterController::class, 'unsubscribe'])
         ->name('newsletter.unsubscribe');
 });
 
-// =============================
-// DASHBOARD & ADMIN (AUTH)
-// =============================
+// ==========================================================
+// SECTION PRIVÉE : DASHBOARD & ADMIN (AUTH)
+// ==========================================================
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
 
+    // Gestion du profil utilisateur
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Gestion administrative de la Newsletter
     Route::prefix('admin/newsletter')
         ->name('admin.newsletter.')
         ->group(function () {
@@ -65,28 +74,47 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 });
 
-// =============================
-// OUTILS (TEMPORAIRE)
-// =============================
-Route::get('/init-db', function () {
-    try {
-        Artisan::call('migrate', ['--force' => true]);
-        return "✅ Base de données migrée avec succès !";
-    } catch (\Exception $e) {
-        return "❌ Erreur : " . $e->getMessage();
-    }
+// ==========================================================
+// SECTION OUTILS SYSTEME (Maintenance Vercel/Supabase)
+// ==========================================================
+// Note : En production, vous devriez protéger ces routes par un middleware de sécurité
+Route::prefix('sys')->group(function () {
+
+    // 1. Migration de la base de données (Supabase)
+    Route::get('/migrate', function () {
+        try {
+            // --force est obligatoire en production/Vercel
+            Artisan::call('migrate', ['--force' => true]);
+            $output = Artisan::output();
+            return "✅ Migration réussie ! <br><pre>$output</pre>";
+        } catch (\Exception $e) {
+            Log::error("Erreur Migration: " . $e->getMessage());
+            return "❌ Erreur de migration : " . $e->getMessage();
+        }
+    });
+
+    // 2. Nettoyage complet du cache (Configuration, Routes, Vues)
+    Route::get('/clear-all', function() {
+        try {
+            Artisan::call('config:clear');
+            Artisan::call('cache:clear');
+            Artisan::call('view:clear');
+            Artisan::call('route:clear');
+            return "✅ Cache Laravel entièrement nettoyé sur Vercel !";
+        } catch (\Exception $e) {
+            return "❌ Erreur lors du nettoyage : " . $e->getMessage();
+        }
+    });
+
+    // 3. Test de connexion brute à la DB (Diagnostic Supabase)
+    Route::get('/test-db', function () {
+        try {
+            \DB::connection()->getPdo();
+            return "✅ Connexion à Supabase (" . config('database.connections.pgsql.host') . ") établie !";
+        } catch (\Exception $e) {
+            return "❌ Échec de connexion : " . $e->getMessage();
+        }
+    });
 });
 
 require __DIR__.'/auth.php';
-
-// À ajouter à la fin de routes/web.php
-Route::get('/clear-all', function() {
-    try {
-        Artisan::call('config:clear');
-        Artisan::call('cache:clear');
-        Artisan::call('view:clear');
-        return "✅ Cache Laravel nettoyé avec succès sur Vercel !";
-    } catch (\Exception $e) {
-        return "❌ Erreur lors du nettoyage : " . $e->getMessage();
-    }
-});

@@ -30,19 +30,20 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'), // Priorité à l'URL complète sur Vercel
+            'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', 'aws-0-eu-central-1.pooler.supabase.com'),
             'port' => env('DB_PORT', '6543'),
             'database' => env('DB_DATABASE', 'postgres'),
-            'username' => env('DB_USERNAME', 'postgres.hwllvkdvhfrkajgxwdeo'),
+            'username' => env('DB_USERNAME'),
             'password' => env('DB_PASSWORD'),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'require'),
+            // Ajout des options PDO pour forcer le SSL sur certaines configurations PHP
             'options' => [
-                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ],
         ],
 
@@ -66,17 +67,28 @@ return [
     */
 
     'redis' => [
+
         'client' => env('REDIS_CLIENT', 'phpredis'),
+
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
         ],
+
         'default' => [
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_DB', '0'),
         ],
+
+        'cache' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_DB', '1'),
+        ],
+
     ],
 
 ];

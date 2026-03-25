@@ -1,10 +1,6 @@
 <?php
+// api/index.php
 
-/**
- * Point d'entrée pour Vercel Serverless Functions
- */
-
-// 1. Définir les dossiers de stockage dans /tmp (seul endroit accessible en écriture sur Vercel)
 $storageFolders = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/sessions',
@@ -18,5 +14,7 @@ foreach ($storageFolders as $folder) {
     }
 }
 
-// 2. Charger l'application Laravel
+// Optionnel : Forcer le vidage du cache de config au démarrage si nécessaire
+// putenv('APP_CONFIG_CACHE=/tmp/config.php');
+
 require __DIR__ . '/../public/index.php';
