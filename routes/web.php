@@ -78,3 +78,15 @@ Route::get('/init-db', function () {
 });
 
 require __DIR__.'/auth.php';
+
+// À ajouter à la fin de routes/web.php
+Route::get('/clear-all', function() {
+    try {
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        return "✅ Cache Laravel nettoyé avec succès sur Vercel !";
+    } catch (\Exception $e) {
+        return "❌ Erreur lors du nettoyage : " . $e->getMessage();
+    }
+});

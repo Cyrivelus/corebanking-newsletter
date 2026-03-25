@@ -1,7 +1,10 @@
 <?php
-// api/index.php
 
-// 1. Créer les dossiers de stockage dans /tmp (nécessaire pour Vercel)
+/**
+ * Point d'entrée pour Vercel Serverless Functions
+ */
+
+// 1. Définir les dossiers de stockage dans /tmp (seul endroit accessible en écriture sur Vercel)
 $storageFolders = [
     '/tmp/storage/framework/views',
     '/tmp/storage/framework/sessions',
@@ -15,5 +18,5 @@ foreach ($storageFolders as $folder) {
     }
 }
 
-// 2. Lancer l'application normalement
+// 2. Charger l'application Laravel
 require __DIR__ . '/../public/index.php';
