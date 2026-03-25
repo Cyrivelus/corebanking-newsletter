@@ -1,4 +1,5 @@
 <?php
+
 // api/index.php
 
 $storageFolders = [
@@ -14,7 +15,10 @@ foreach ($storageFolders as $folder) {
     }
 }
 
-// Optionnel : Forcer le vidage du cache de config au démarrage si nécessaire
-// putenv('APP_CONFIG_CACHE=/tmp/config.php');
+/*
+|--------------------------------------------------------------------------
+| Bootstrap Laravel
+|--------------------------------------------------------------------------
+*/
 
-require __DIR__ . '/../public/index.php';
+require __DIR__.'/../public/index.php';
